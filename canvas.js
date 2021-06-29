@@ -9,7 +9,24 @@ const mouse = {
     y: innerHeight
 }
 
-const colors = ['#c3e0e5','#274472','#5885af','#41729f']
+const color1 = ['#F3FEB0','#FEA443','#705E78','#A5AAA3', '#812F33'];
+const color2 = ['#D9D9D9','#6D7E8C','#0487D9','#03588C', '#0D0D0D'];
+const color3 = ['#665BF0','#4F92F7','#53CEE0','#4FF7BB', '#91F09D'];
+const color4 = ['#F0DE59','#FA881B','#E00022','#8216FA', '#3291F0'];
+
+const colorPallets = [color1, color2, color3, color4];
+
+const colors = colorPallets[Math.floor(Math.random()*colorPallets.length)]
+
+// Implementation settings
+let particles;
+let objCount = 50;
+// around 10 is good but this one isn't too sensitive
+let trailLength = 10;
+// set small, around 0.01 - 0.1 is nice: sensitive!
+let particleMouseResponseSpeed = 0.02;
+let minOrbitRadius = 2;
+let maxOrbitRadius = 10;
 
 // Event Listeners
 addEventListener('mousemove', (event) => {
@@ -35,7 +52,7 @@ function Particle(x, y, radius, color) {
     this.radians = Math.random() * Math.PI * 2;
 
     if (radius==undefined){
-        this.radius = randomIntFromRange(3, 12);
+        this.radius = randomIntFromRange(minOrbitRadius, maxOrbitRadius);
     }else{
         this.radius = radius;
     }
@@ -43,7 +60,6 @@ function Particle(x, y, radius, color) {
     // this.orbitMag = randomIntFromRange(30,500);
     // smaller radius have smaller orbit
     this.orbitMag = this.radius*20;
-    this.bodyMax = 5;
     this.lastMouse = {x: x, y: y};
 
     // conditional assignments
@@ -64,8 +80,8 @@ function Particle(x, y, radius, color) {
 
 
         // Drag effect - integrator control
-        this.lastMouse.x += (mouse.x - this.lastMouse.x) * 0.02;
-        this.lastMouse.y += (mouse.y - this.lastMouse.y) * 0.02;
+        this.lastMouse.x += (mouse.x - this.lastMouse.x) * particleMouseResponseSpeed;
+        this.lastMouse.y += (mouse.y - this.lastMouse.y) * particleMouseResponseSpeed;
 
         // continually increase the radians counter
         this.radians += this.velocity;
@@ -92,25 +108,19 @@ function Particle(x, y, radius, color) {
 
 }
 
-// Implementation
-let particles;
-let objCount = 100;
-
 function init() {
     particles = []
 
     for (let i = 0; i < objCount; i++) {
         particles.push(new Particle(mouse.x, mouse.y));
     }
-
-    console.log(particles);
 }
 
 // Animation Loop
 function animate() {
     requestAnimationFrame(animate)
     // ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.fillStyle = 'rgba(255, 255, 255,'+1/trailLength+')';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.fillText('', mouse.x, mouse.y);
@@ -119,24 +129,18 @@ function animate() {
     })
 }
 
-init()
-animate()
+init();
+animate();
 
 
 // Utilities
 function randomIntFromRange(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min)
+    return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 function randomColor(colors) {
-    return colors[Math.floor(Math.random() * colors.length)]
+    return colors[Math.floor(Math.random() * colors.length)];
 }
 
-function distance(x1, y1, x2, y2) {
-    const xDist = x2 - x1
-    const yDist = y2 - y1
-
-    return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2))
-}
 
 
